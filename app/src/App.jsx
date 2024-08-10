@@ -9,7 +9,8 @@ const App = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [filteredData,setFilteredData] = useState(null);
+  const [filteredData, setFilteredData] = useState(null);
+  const [selectedBtn, setSelectedBtn] = useState("all");
 
   useEffect(() => {
     // useEffect helps to perform the network call and fetch data before the rendering of UI
@@ -35,6 +36,37 @@ const App = () => {
     fetchFoodData();
   }, []); //[] is passed so the useEffext only runs once
 
+  const searchFood = (event) => {
+    const searchValue = event.target.value;
+
+    if (searchValue == "") {
+      setFilteredData(null);
+    }
+
+    const filter = data?.filter(
+      (
+        value // to compare the search and backend data value
+      ) => value.name.toLowerCase().includes(searchValue.toLowerCase())
+    );
+    setFilteredData(filter);
+  };
+
+  const filterfood = (type) => {
+    if (type == "all") {
+      setFilteredData(data);
+      setSelectedBtn("all");
+      return;
+    }
+
+    const filter = data?.filter(
+      (
+        value // to compare the search and backend data value
+      ) => value.type.toLowerCase().includes(type.toLowerCase())
+    );
+    setFilteredData(filter);
+    setSelectedBtn(type);
+  };
+
   if (error) return <div>{error}</div>;
   if (loading) return <div>{"loading..."}</div>;
 
@@ -47,15 +79,19 @@ const App = () => {
           </div>
 
           <div className="search">
-            <input type="text" placeholder="Search Food..." />
+            <input
+              onChange={searchFood}
+              type="text"
+              placeholder="Search Food..."
+            />
           </div>
         </TopContainer>
 
         <FilterContainer>
-          <Button>All</Button>
-          <Button>Breakfast</Button>
-          <Button>Lunch</Button>
-          <Button>Dinner</Button>
+          <Button onClick={() => filterfood("all")}>All</Button>
+          <Button onClick={() => filterfood("breakfast")}>Breakfast</Button>
+          <Button onClick={() => filterfood("lunch")}>Lunch</Button>
+          <Button onClick={() => filterfood("dinner")}>Dinner</Button>
         </FilterContainer>
       </Container>
 
@@ -71,7 +107,7 @@ export const Container = styled.div`
   margin: 0 auto;
 `;
 const TopContainer = styled.div`
-  min-height: 140px;
+  height: 140px;
   display: flex;
   justify-content: space-between;
   padding: 16px;
@@ -86,7 +122,16 @@ const TopContainer = styled.div`
       height: 40px;
       font-size: 16px;
       padding: 0 10px;
+
+      &::placeholder{
+        color: white;
+      }
     }
+  }
+
+  @media (0 < width < 600px) {
+    flex-direction: column;
+    height: 120px;
   }
 `;
 
@@ -102,4 +147,9 @@ export const Button = styled.button`
   border-radius: 5px;
   padding: 6px 12px;
   border: none;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #f22f2f;
+  }
 `;
